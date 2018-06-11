@@ -1,0 +1,55 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.Inset {
+  margin: 1rem;
+}
+
+.Auth-card {
+  position: absolute;
+  width: 25%;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  text-align: center;
+  border: none !important;
+  box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.25);
+}
+
+.Content-card {
+  margin-bottom: 0.5rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.Content-card:hover {
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+@media (max-width: 720px) {
+  .Auth-card {
+    position: absolute;
+    left: 0%;
+    top: 50%;
+    transform: translateX(0%) translateY(-50%);
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.md > p > img {
+  max-width: 100%;
+}
+
+blockquote {
+  border-left: 4px solid lightgray;
+  padding: 8px;
+  margin: 8px !important;
+}
+
+blockquote > p {
+  margin-bottom: 0 !important;
+}
