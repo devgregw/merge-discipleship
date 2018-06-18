@@ -3,7 +3,7 @@ import DatabaseLoader from '../DatabaseLoader'
 import Toolbar from '../Toolbar'
 import Utils from '../../Utils'
 import BasicCard from '../BasicCard'
-import { Button, Container, Row, Col, Progress, Input } from 'reactstrap'
+import { Button, Progress, Input, Badge } from 'reactstrap'
 import firebase from 'firebase'
 import ProgressModal from '../ProgressModal'
 import * as moment from 'moment'
@@ -35,13 +35,22 @@ class MarkdownReader extends React.Component {
 class Questions extends React.Component {
     createQuestionCard(index, questionInfo, response) {
         return <BasicCard key={questionInfo.id} title={`Question ${index + 1}`} subtitle={questionInfo.question}>
-            <Input required readOnly={Boolean(response)} defaultValue={response || null} type={questionInfo.type == "short" ? "text" : "textarea"} id={`q${questionInfo.id}`}/>
+            <Input required readOnly={Boolean(response)} defaultValue={Boolean(response) ? response.response : null} type={questionInfo.type === "short" ? "text" : "textarea"} id={`q${questionInfo.id}`}/>
+            {Boolean(response) ? <Badge color="success" pill>Submitted on {moment(response.submitted, moment.ISO_8601).format('dddd, D MMMM, YYYY [at] h:mm A')}</Badge> : null}
         </BasicCard>
     }
 
     render() {
+        let questions = Object.getOwnPropertyNames(this.props.assignment.questions).map(id => this.props.assignment.questions[id])
+        let availableQuestions = questions.filter(q => moment(q.startDate, moment.ISO_8601).isBefore(moment()))
+        console.log(availableQuestions)
+        let upcomingQuestions = questions.filter(q => moment(q.startDate, moment.ISO_8601).isAfter(moment()))
+        console.log(upcomingQuestions)
         let responses = ((this.props.user.responses || {})[this.props.set.id] || {})[this.props.assignment.id] || {}
-        return Object.getOwnPropertyNames(this.props.assignment.questions).map(qid => this.props.assignment.questions[qid]).map((questionInfo, index) => this.createQuestionCard(index, questionInfo, Object.getOwnPropertyNames(responses).length > 0 ? responses[questionInfo.id].response : null))
+        return <div className="Inset">
+            {availableQuestions.length > 0 ? availableQuestions.map((questionInfo, index) => this.createQuestionCard(index, questionInfo, Object.getOwnPropertyNames(responses).length > 0 ? responses[questionInfo.id] : null)) : null}
+            {upcomingQuestions.length > 0 ? <p style={{fontSize: 'large'}}>More questions will become available on {upcomingQuestions.map((q, i) => <span><Badge color="primary" pill>{moment(q.startDate, moment.ISO_8601).format('dddd, D MMMM, YYYY [at] h:mm A')}</Badge>{i === upcomingQuestions.length - 2 ? ', and ' : i === upcomingQuestions.length - 1 ? '' : ', '}</span>)}.<br/>You must answer all questions to complete the assignment.</p> : <p style={{fontSize: 'large'}}>All questions are available.<br/>You must answer all questions to complete the assignment.</p>}
+        </div>
     }
 }
 
@@ -54,17 +63,15 @@ export default class UserAssignmentReader extends React.Component {
     }
 
     finish(database) {
+        if (!window.confirm('Are you sure you want to save your progress now?  You won\'t be able to edit your responses to the questions you completed.'))
+            return
         let userInfo = database.users[this.props.match.params.user]
         let setInfo = database.sets[this.props.match.params.set]
         let assignmentInfo = setInfo.assignments[this.props.match.params.assignment]
         let questions = Object.getOwnPropertyNames(assignmentInfo.questions).map(qid => assignmentInfo.questions[qid])
-        let fields = questions.map(q => document.getElementById(`q${q.id}`))
-        if (fields.filter(f => f.validity.valueMissing).length > 0)
-            alert('Please respond to all questions.')
-        else if (window.confirm('Are you sure you want to submit this assignment?  You won\'t be able to change your responses later.')) {
-            this.setState({submitting: true})
-            Promise.all(questions.map((q, index) => firebase.database().ref(`/discipleship/users/${userInfo.id}/responses/${setInfo.id}/${assignmentInfo.id}/${q.id}`).set({response: fields[index].value, submitted: moment().toISOString()}))).then(() => window.location.replace(`/${userInfo.id}/${setInfo.id}`))
-        }
+        let responses = questions.map(q => {return{qid: q.id, input: document.getElementById(`q${q.id}`)}}).filter(r => Boolean(r.input)).filter(r => /\S/.test(r.input.value))
+        this.setState({submitting: true})
+        Promise.all(responses.map((r, index) => firebase.database().ref(`/discipleship/users/${userInfo.id}/responses/${setInfo.id}/${assignmentInfo.id}/${r.qid}`).set({response: r.input.value, submitted: moment().toISOString()}))).then(() => window.location.replace(`/${userInfo.id}/${setInfo.id}`))
     }
 
     onLoad(database) {
@@ -96,9 +103,11 @@ export default class UserAssignmentReader extends React.Component {
                 <h1>Read</h1>
                 <MarkdownReader fileName={assignmentInfo.content}/>
                 <hr/>
-                <h1>Questions</h1>
+            </div>
+            <div style={{background: 'linear-gradient(white, #eee, white)'}}>
+                <h1 className="Inset">Questions</h1>
                 <Questions assignment={assignmentInfo} set={setInfo} user={userInfo}/>
-                <Button disabled={Object.getOwnPropertyNames(((userInfo.responses || {})[setInfo.id] || {})[assignmentInfo.id] || {}).length > 0} color="success" size="lg" onClick={this.finish.bind(this, database)}>Finish Assignment</Button>
+                <Button className="Inset" color="success" size="lg" onClick={this.finish.bind(this, database)}>Save Progress</Button>
             </div>
         </div>
     }

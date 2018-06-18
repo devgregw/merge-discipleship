@@ -13,7 +13,7 @@ export default class DatabaseLoader extends React.Component {
     render() {
         switch (this.state.response) {
             case null:
-                firebase.database().ref(this.props.path).once('value').then(snap => this.setState({response: snap.val()}), error => { alert(JSON.stringify(error)) })
+                firebase.database().ref(this.props.path).once('value').then(snap => this.setState({response: snap.exists() ? snap.val() : null}), error => { alert(JSON.stringify(error)) })
                 return <Progress style={{position: 'absolute', top: '50%', left: '50%', width: '66%', transform: 'translateX(-50%) translateY(-50%)'}} color="primary" animated value="100">Loading...</Progress>
             default: return this.props.render(this.state.response)
         }

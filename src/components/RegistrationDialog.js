@@ -1,7 +1,6 @@
 import React from 'react'
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress, Form, FormGroup, Label, Input, FormFeedback, FormText, ButtonGroup } from 'reactstrap'
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input, FormFeedback, FormText, ButtonGroup } from 'reactstrap'
 import firebase from 'firebase'
-import ProgressModal from './ProgressModal'
 import Utils from '../Utils'
 
 export default class RegistrationDialog extends React.Component {
@@ -89,8 +88,8 @@ export default class RegistrationDialog extends React.Component {
             </ModalBody>
             <ModalFooter>
                 <ButtonGroup>
-                    <Button color="danger" size="sm" onClick={this.props.onCancel}>Cancel</Button>
-                    <Button color="success" size="lg" onClick={this.register.bind(this)}>Register</Button>
+                    <Button color="dark" outline onClick={this.props.onCancel}>Cancel</Button>
+                    <Button color="primary" onClick={this.register.bind(this)}>Register</Button>
                 </ButtonGroup>
             </ModalFooter>
         </Modal>

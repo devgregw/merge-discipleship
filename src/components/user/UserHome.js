@@ -8,7 +8,7 @@ import { Button } from 'reactstrap'
 export default class UserHome extends React.Component {
     createNewCard(set, uid) {
         let count = (set.assignments ? Object.getOwnPropertyNames(set.assignments) : []).length
-        return <BasicCard key={set.id} title={set.name} subtitle={`${count} assignment${count == 1 ? '' : 's'}`}>
+        return <BasicCard key={set.id} title={set.name} subtitle={`${count} assignment${count === 1 ? '' : 's'}`}>
             <Button color="primary" size="lg" outline onClick={() => window.location.assign(`/${uid}/${set.id}`)}>Start</Button>
         </BasicCard>
     }
@@ -16,13 +16,13 @@ export default class UserHome extends React.Component {
     createResumeCard(set, userInfo) {
         let count = this.getRemainingAssignments(set, userInfo)
         let totalAssignments = set.assignments ? Object.getOwnPropertyNames(set.assignments) : []
-        return <BasicCard key={set.id} title={set.name} subtitle={`${count} remaining assignment${count == 1 ? '' : 's'} (${totalAssignments.length} total)`}>
+        return <BasicCard key={set.id} title={set.name} subtitle={`${count} remaining assignment${count === 1 ? '' : 's'} (${totalAssignments.length} total)`}>
             <Button color="primary" size="lg" outline onClick={() => window.location.assign(`/${userInfo.id}/${set.id}`)}>Resume</Button>
         </BasicCard>
     }
 
     createCompletedCard(set, userInfo) {
-        let totalAssignments = set.assignments ? Object.getOwnPropertyNames(set.assignments) : []
+        //let totalAssignments = set.assignments ? Object.getOwnPropertyNames(set.assignments) : []
         return <BasicCard key={set.id} title={set.name} subtitle="Complete">
             <Button color="primary" size="lg" outline onClick={() => window.location.assign(`/${userInfo.id}/${set.id}`)}>Review</Button>
         </BasicCard>
@@ -45,9 +45,14 @@ export default class UserHome extends React.Component {
         let joinedSets = userInfo.responses ? Object.getOwnPropertyNames(userInfo.responses).map(id => database.sets[id]).filter(set => Boolean(set)) : []
         let otherSets = database.sets ? Object.getOwnPropertyNames(database.sets).filter(id => joinedSets.map(set => set.id).indexOf(id) < 0).map(id => database.sets[id]) : []
         let completedSets = joinedSets.filter(set => this.getRemainingAssignments(set, userInfo) === 0)
-        return <div>
-            <Toolbar title={`Hey, ${userInfo.firstName}!`} items={[Utils.signOutToolbarItem, Utils.adminToolbarItem]}/>
+        return <div style={{
+            background: '#f6f6f6'
+        }}>
+            <Toolbar title={`Hey, ${userInfo.firstName}!`} items={[Utils.signOutToolbarItem]}/>
             <div className="Inset">
+                <BasicCard title="Discussion" subtitle="Share your thoughts and ask questions!">
+                    <Button color="primary" size="lg" outline onClick={() => window.location.assign(`/${userInfo.id}/chat`)}>Open Discussion Board</Button>
+                </BasicCard>
                 <h3>Pick Up Where You Left Off</h3>
                 <p>{joinedSets.filter(set => this.getRemainingAssignments(set, userInfo) > 0).length === 0 ? 'You haven\'t started any study sets.' : joinedSets.filter(set => this.getRemainingAssignments(set, userInfo) > 0).map(set => this.createResumeCard(set, userInfo))}</p>
                 <h3>Start a New Study Set</h3>

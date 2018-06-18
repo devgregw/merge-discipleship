@@ -7,10 +7,8 @@ import {
     Input,
     Card,
     CardBody,
-    CardImg,
     CardTitle,
     CardSubtitle,
-    Progress,
     Alert
 } from 'reactstrap'
 import firebase from 'firebase'

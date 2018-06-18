@@ -7,7 +7,6 @@ import firebase from 'firebase'
 
 import AuthRequired from './components/AuthRequired'
 import Home from './components/Home'
-import DatabaseLoader from './components/DatabaseLoader'
 
 import Admin from './components/admin/Admin'
 import AdminAssignmentManager from './components/admin/AdminAssignmentManager'
@@ -24,6 +23,8 @@ import AdminAuthentication from './components/admin/AdminAuthentication'
 import UserAssignmentReader from './components/user/UserAssignmentReader'
 import UserSetReader from './components/user/UserSetReader'
 import UserHome from './components/user/UserHome'
+
+import LiveChat from './components/user/LiveChat'
 
 import registerServiceWorker from './registerServiceWorker';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
@@ -60,6 +61,7 @@ ReactDOM.render(
             <AuthorizedRoute path="/admin/users/:user/responses/:set/:assignment" exact render={match => <AdminUserResponseAssignmentManager match={match}/>}/>
             <AuthorizedRoute path="/admin/users/:user/responses/:set/:assignment/:question" exact render={match => <AdminUserResponseQuestionManager match={match}/>}/>
             <Route path="/:user" exact component={UserHome}/>
+            <Route path="/:user/chat" exact component={LiveChat}/>
             <Route path="/:user/:set" exact component={UserSetReader}/>
             <Route path="/:user/:set/:assignment" exact component={UserAssignmentReader}/>
         </Switch>

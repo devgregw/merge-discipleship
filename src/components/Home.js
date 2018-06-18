@@ -3,14 +3,10 @@ import {
     Button,
     Form,
     FormGroup,
-    Label,
     Input,
     Card,
     CardBody,
-    CardImg,
     CardTitle,
-    CardSubtitle,
-    Progress,
     Alert,
     ButtonGroup
 } from 'reactstrap'

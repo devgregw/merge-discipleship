@@ -1,15 +1,10 @@
 import React from 'react'
 import {
     Button,
-    UncontrolledButtonDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
     Navbar,
     NavbarToggler,
     NavbarBrand,
     Nav,
-    NavItem,
     Collapse
 } from 'reactstrap'
 
@@ -17,7 +12,7 @@ export default class Toolbar extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            navToggle: false
+            navToggle: false || Boolean(props.startOpen)
         }
     }
 
